@@ -1,7 +1,7 @@
 import { SpecifierMapper } from "./specifiers/specifier_mapper.ts";
 import { FileAnalyzer } from "./file_analyzer.ts";
 import { assertEquals } from "@std/assert";
-import { Project, InMemoryFileSystemHost } from "ts-morph";
+import { InMemoryFileSystemHost, Project } from "ts-morph";
 import { ImportMapBuilder } from "./import_map.ts";
 
 Deno.test("file analyzer", async () => {
@@ -21,7 +21,7 @@ Deno.test("file analyzer", async () => {
         });
       }
       return Promise.resolve(undefined);
-    }
+    },
   };
   const analyzer = new FileAnalyzer(mapper);
   const fileSystem = new InMemoryFileSystemHost();
@@ -38,10 +38,13 @@ import "./other.ts";
   const importMap = new ImportMapBuilder({});
 
   await analyzer.analyzeFile(file, importMap);
-  assertEquals(file.getText(), `import "@scope/abc/export";
+  assertEquals(
+    file.getText(),
+    `import "@scope/abc/export";
 import "@std/path";
 import "./other.ts";
-`);
+`,
+  );
   assertEquals(importMap.build(), {
     "@scope/abc": "jsr:@scope/abc@1",
     "@std/path": "jsr:@std/path@0.193",

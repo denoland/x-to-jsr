@@ -1,6 +1,6 @@
 import { FileSystemHost } from "@ts-morph/common";
 import { Project } from "ts-morph";
-import $, { Path } from "dax";
+import { Path } from "dax";
 import { DenoJsonResolver } from "./deno_json.ts";
 import { ImportMapBuilder } from "./import_map.ts";
 import { FileAnalyzer } from "./file_analyzer.ts";
@@ -8,8 +8,10 @@ import { FileAnalyzer } from "./file_analyzer.ts";
 export interface Environment {
   fs: FileSystemHost;
   cwd(): Path;
+  execCommand(text: string): Promise<string>;
   exit(code?: number): void;
   logStep(message: string, ...args: unknown[]): void;
+  logError(message: string, ...args: unknown[]): void;
   logWarn(message: string, ...args: unknown[]): void;
   log(message: string, ...args: unknown[]): void;
 }
@@ -17,7 +19,7 @@ export interface Environment {
 export interface AppOptions {
   fileAnalyzer: FileAnalyzer;
   denoJsonResolver: DenoJsonResolver;
-  environment: Environment
+  environment: Environment;
 }
 
 export async function runApp({
@@ -25,7 +27,7 @@ export async function runApp({
   denoJsonResolver,
   environment,
 }: AppOptions) {
-  const { log, logStep, logWarn, fs } = environment;
+  const { logStep, logError, fs } = environment;
   const cwd = environment.cwd();
   const denoJson = denoJsonResolver.resolve(cwd);
   if (denoJson === "exit") {
@@ -38,19 +40,25 @@ export async function runApp({
   });
 
   logStep("Analyzing", cwd.toString());
-  logWarn("WARNING This will modify the files in this directory.");
-  log("Please check in all code to source control before continuing.");
-  const confirmed = await $.confirm(`Continue?`, {
-    default: false,
-  });
-  if (!confirmed) {
-    environment.logWarn("Aborted.");
-    Deno.exit(1);
+  if (
+    (await environment.execCommand("git rev-parse --is-inside-work-tree")) !==
+      "true"
+  ) {
+    logError("Failed Not a git repository.");
+    environment.exit(1);
+    return;
+  }
+  if (
+    (await environment.execCommand("git status --porcelain")).trim().length > 0
+  ) {
+    logError(
+      "Failed Git directory has pending changes. Please check in all changes before running this tool.",
+    );
+    environment.exit(1);
+    return;
   }
 
-  const packageName = denoJson.value.name ??
-    await $.prompt("Enter package name:");
-  logStep("Building", packageName);
+  logStep("Building...");
 
   const entries = cwd.walkSync({
     includeDirs: false,
@@ -82,9 +90,16 @@ export async function runApp({
   project.saveSync();
   fs.writeFileSync(
     denoJson.path.toString(),
-    JSON.stringify({
-    ...denoJson.value,
-    imports: importMapBuilder.build(),
-  }, undefined, 2));
+    JSON.stringify(
+      {
+        name: "",
+        version: "",
+        ...denoJson.value,
+        imports: importMapBuilder.build(),
+      },
+      undefined,
+      2,
+    ),
+  );
   logStep("Done.");
 }

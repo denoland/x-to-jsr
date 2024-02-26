@@ -15,6 +15,7 @@
       "jsr:@std/path@0.213.0": "jsr:@std/path@0.213.0",
       "jsr:@std/path@^0.213.0": "jsr:@std/path@0.213.0",
       "jsr:@std/streams@0.213.0": "jsr:@std/streams@0.213.0",
+      "npm:@ts-morph/common@^0.22": "npm:@ts-morph/common@0.22.0",
       "npm:ts-morph@^21.0": "npm:ts-morph@21.0.1"
     },
     "jsr": {

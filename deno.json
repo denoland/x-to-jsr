@@ -7,6 +7,5 @@
     "dax": "jsr:@david/dax@0.39",
     "ts-morph": "npm:ts-morph@^21.0"
   },
-  "exports": {
-  }
+  "exports": "./main.ts"
 }

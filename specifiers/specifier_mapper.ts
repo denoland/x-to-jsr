@@ -113,8 +113,8 @@ class DenoLandMapper {
       };
     } else {
       return {
-        bareSpecifier: `${jsrPkg.scope}/${jsrPkg.name}`,
-        base: `jsr:${jsrPkg.scope}/${jsrPkg.name}@${version}`,
+        bareSpecifier: `@${jsrPkg.scope}/${jsrPkg.name}`,
+        base: `jsr:@${jsrPkg.scope}/${jsrPkg.name}@${version}`,
         subpath: subpath?.replace(/\.ts$/, "").replace(/^mod$/, ""),
       };
     }

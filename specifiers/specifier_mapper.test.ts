@@ -8,7 +8,7 @@ Deno.test("maps specifiers", async () => {
     attemptFindJsrPkg(name: string): Promise<JsrPackage | undefined> {
       if (name === "ts_morph") {
         return Promise.resolve({
-          scope: "@david",
+          scope: "david",
           name: "ts-morph",
         });
       }

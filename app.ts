@@ -1,5 +1,5 @@
 import { FileSystemHost } from "@ts-morph/common";
-import { Project } from "ts-morph";
+import { FileSystemRefreshResult, Project } from "ts-morph";
 import { Path } from "dax";
 import { DenoJsonResolver } from "./deno_json.ts";
 import { ImportMapBuilder } from "./import_map.ts";
@@ -88,18 +88,27 @@ export async function runApp({
 
   logStep("Saving...");
   project.saveSync();
+  const outputObj: Record<string, unknown> = {
+    name: "",
+    version: "",
+    ...denoJson.value,
+    imports: importMapBuilder.build(),
+  };
+  if (outputObj.exports == null) {
+    if (fs.fileExistsSync(cwd.join("mod.ts").toString())) {
+      outputObj.exports = "./mod.ts"
+    } else {
+      outputObj.exports = {
+        ...[...scriptPaths, ...jsonPaths].map(p => {
+          const path = "./" + cwd.relative(p);
+          return { [path.toString()]: path.toString() };
+        }),
+      }
+    }
+  }
   fs.writeFileSync(
     denoJson.path.toString(),
-    JSON.stringify(
-      {
-        name: "",
-        version: "",
-        ...denoJson.value,
-        imports: importMapBuilder.build(),
-      },
-      undefined,
-      2,
-    ),
+    JSON.stringify(outputObj, undefined, 2),
   );
   logStep("Done.");
 }

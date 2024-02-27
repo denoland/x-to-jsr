@@ -36,10 +36,17 @@ export class DenoJsonResolver {
       if (json === "exit") {
         return json;
       }
-      return {
-        path: denoJsonc,
-        value: json ?? {},
-      };
+      if (json != null) {
+        return {
+          path: denoJsonc,
+          value: json
+        };
+      } else {
+        return {
+          path: denoJson,
+          value: {},
+        };
+      }
     }
   }
 

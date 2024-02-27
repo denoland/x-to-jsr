@@ -8,6 +8,10 @@ import {
 import { SpecifierMapper } from "./specifiers/specifier_mapper.ts";
 import { ImportMapBuilder } from "./import_map.ts";
 import { Path } from "dax";
+import { StringLiteral } from "ts-morph";
+
+const globalTypeAugNotSupported = "";
+const ensureNotUsedByExport = "";
 
 export class FileAnalyzer {
   #mapper: SpecifierMapper;
@@ -26,18 +30,28 @@ export class FileAnalyzer {
       } else if (Node.isExportDeclaration(statement)) {
         await this.#visitSpecifier(statement, importMapBuilder);
       } else if (Node.isModuleDeclaration(statement)) {
-        if (statement.getDeclarationKind() === ModuleDeclarationKind.Global) {
-          const relativePath = "./" + this.#cwd.relative(file.getFilePath());
-          const { line, column } = file.getLineAndColumnAtPos(
-            statement.getStart(),
-          );
+        const nameNodes = statement.getNameNodes();
+        const hasGlobalAugmentation = nameNodes instanceof StringLiteral ||
+          statement.getDeclarationKind() === ModuleDeclarationKind.Global;
+        if (hasGlobalAugmentation) {
+          const specifier = this.#getLineAndColumnSpecifier(statement);
           steps.push(
-            `Global type augmentation is not yet supported in JSR.\n    at ${relativePath}:${line}:${column}`,
+            `Global type augmentation is not yet supported in JSR.\n` +
+              `Ensure this file is not used via any export.\n` +
+              `    at ${specifier}\n`,
           );
         }
       }
     }
     return steps;
+  }
+
+  #getLineAndColumnSpecifier(node: Node) {
+    const file = node.getSourceFile();
+    const relativePath = "./" +
+      this.#cwd.relative(file.getFilePath()).replace(/\\/g, "/");
+    const { line, column } = file.getLineAndColumnAtPos(node.getStart());
+    return `${relativePath}:${line}:${column}`;
   }
 
   async #visitSpecifier(

@@ -117,13 +117,16 @@ Deno.test("runs the app when there's a mod.ts file", async () => {
     '  1. Fill in the "name" field in ./deno.json',
     '  2. Fill in the "version" field in ./deno.json',
   ]);
-  assertEquals(env.fs.readFileSync("/deno.json"), `{
+  assertEquals(
+    env.fs.readFileSync("/deno.json"),
+    `{
   "name": "",
   "version": "",
   "exports": "./mod.ts",
   "imports": {}
 }
-`);
+`,
+  );
 });
 
 Deno.test("creates multiple exports when no mod.ts", async () => {
@@ -144,9 +147,11 @@ Deno.test("creates multiple exports when no mod.ts", async () => {
     "Next steps:",
     '  1. Fill in the "name" field in ./deno.json',
     '  2. Fill in the "version" field in ./deno.json',
-    "  3. Make sure the exports in ./deno.json are how you want the exports."
+    "  3. Make sure the exports in ./deno.json are how you want the exports.",
   ]);
-  assertEquals(env.fs.readFileSync("/deno.json"), `{
+  assertEquals(
+    env.fs.readFileSync("/deno.json"),
+    `{
   "name": "",
   "version": "",
   "exports": {
@@ -155,7 +160,8 @@ Deno.test("creates multiple exports when no mod.ts", async () => {
   },
   "imports": {}
 }
-`);
+`,
+  );
 });
 
 function build() {

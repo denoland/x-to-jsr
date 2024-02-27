@@ -134,8 +134,13 @@ export async function runApp({
     if (outputObj.version.length === 0) {
       steps.push(`Fill in the "version" field in ${relativeDenoJson}`);
     }
-    if (typeof outputObj.exports === "object" && Object.entries(outputObj.exports).length > 1) {
-      steps.push(`Make sure the exports in ${relativeDenoJson} are how you want the exports.`);
+    if (
+      typeof outputObj.exports === "object" &&
+      Object.entries(outputObj.exports).length > 1
+    ) {
+      steps.push(
+        `Make sure the exports in ${relativeDenoJson} are how you want the exports.`,
+      );
     }
     for (const [key, value] of Object.entries(imports)) {
       if (value.startsWith("http:") || value.startsWith("https:")) {

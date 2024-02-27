@@ -39,7 +39,7 @@ export class DenoJsonResolver {
       if (json != null) {
         return {
           path: denoJsonc,
-          value: json
+          value: json,
         };
       } else {
         return {

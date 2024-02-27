@@ -1,5 +1,6 @@
 export class ImportMapBuilder {
   #imports: Record<string, string>;
+  #unmappedRemoteImports = new Set<string>();
 
   constructor(imports: Record<string, string>) {
     this.#imports = imports;
@@ -9,6 +10,14 @@ export class ImportMapBuilder {
     bareSpecifier = this.#getUniqueBareSpecifier(bareSpecifier, specifier);
     this.#imports[bareSpecifier] = specifier;
     return bareSpecifier;
+  }
+
+  addUnmappedRemoteImport(specifier: string) {
+    this.#unmappedRemoteImports.add(specifier);
+  }
+
+  getUnmappedRemoteImports() {
+    return [...this.#unmappedRemoteImports];
   }
 
   build() {

@@ -1,27 +1,43 @@
 import {
   ExportDeclaration,
   ImportDeclaration,
+  ModuleDeclarationKind,
   Node,
   SourceFile,
 } from "ts-morph";
 import { SpecifierMapper } from "./specifiers/specifier_mapper.ts";
 import { ImportMapBuilder } from "./import_map.ts";
+import { Path } from "dax";
 
 export class FileAnalyzer {
   #mapper: SpecifierMapper;
+  #cwd: Path;
 
-  constructor(mapper: SpecifierMapper) {
+  constructor(mapper: SpecifierMapper, cwd: Path) {
     this.#mapper = mapper;
+    this.#cwd = cwd;
   }
 
   async analyzeFile(file: SourceFile, importMapBuilder: ImportMapBuilder) {
+    const steps = [];
     for (const statement of file.getStatements()) {
       if (Node.isImportDeclaration(statement)) {
         await this.#visitSpecifier(statement, importMapBuilder);
       } else if (Node.isExportDeclaration(statement)) {
         await this.#visitSpecifier(statement, importMapBuilder);
+      } else if (Node.isModuleDeclaration(statement)) {
+        if (statement.getDeclarationKind() === ModuleDeclarationKind.Global) {
+          const relativePath = "./" + this.#cwd.relative(file.getFilePath());
+          const { line, column } = file.getLineAndColumnAtPos(
+            statement.getStart(),
+          );
+          steps.push(
+            `Global type augmentation is not yet supported in JSR.\n    at ${relativePath}:${line}:${column}`,
+          );
+        }
       }
     }
+    return steps;
   }
 
   async #visitSpecifier(
@@ -48,6 +64,10 @@ export class FileAnalyzer {
         finalSpecifier += mappedSpecifier.subpath;
       }
       statement.setModuleSpecifier(finalSpecifier);
+    } else if (
+      specifier.startsWith("https:") || specifier.startsWith("http:")
+    ) {
+      importMapBuilder.addUnmappedRemoteImport(specifier);
     }
   }
 }

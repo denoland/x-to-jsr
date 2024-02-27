@@ -3,6 +3,7 @@ import { FileAnalyzer } from "./file_analyzer.ts";
 import { assertEquals } from "@std/assert";
 import { InMemoryFileSystemHost, Project } from "ts-morph";
 import { ImportMapBuilder } from "./import_map.ts";
+import $ from "dax";
 
 Deno.test("file analyzer", async () => {
   const mapper: SpecifierMapper = {
@@ -23,30 +24,42 @@ Deno.test("file analyzer", async () => {
       return Promise.resolve(undefined);
     },
   };
-  const analyzer = new FileAnalyzer(mapper);
+  const cwd = $.path("/home/jsr/");
+  const analyzer = new FileAnalyzer(mapper, cwd);
   const fileSystem = new InMemoryFileSystemHost();
   const project = new Project({
     fileSystem,
   });
   const file = project.createSourceFile(
-    "file.ts",
+    cwd.join("file.ts").toString(),
     `import "https://deno.land/x/abc@1.0.0/export.ts";
 import "https://deno.land/std@0.193.0/path/mod.ts";
 import "./other.ts";
+
+global {
+  interface GlobalTest {}
+}
 `,
   );
   const importMap = new ImportMapBuilder({});
 
-  await analyzer.analyzeFile(file, importMap);
+  const steps = await analyzer.analyzeFile(file, importMap);
   assertEquals(
     file.getText(),
     `import "@scope/abc/export";
 import "@std/path";
 import "./other.ts";
+
+global {
+  interface GlobalTest {}
+}
 `,
   );
   assertEquals(importMap.build(), {
     "@scope/abc": "jsr:@scope/abc@1",
     "@std/path": "jsr:@std/path@0.193",
   });
+  assertEquals(steps, [
+    "Global type augmentation is not yet supported in JSR.\n    at ./file.ts:5:1",
+  ]);
 });

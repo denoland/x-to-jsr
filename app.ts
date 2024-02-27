@@ -95,7 +95,7 @@ export async function runApp({
     } else {
       outputObj.exports = {
         ...[...scriptPaths, ...jsonPaths].map((p) => {
-          const path = "./" + cwd.relative(p);
+          const path = "./" + cwd.relative(p).replace(/\\/g, "/");
           return { [path.toString()]: path.toString() };
         }).reduce((a, b) => ({ ...a, ...b }), {}),
       };
@@ -165,15 +165,16 @@ export async function runApp({
 
 function* walkFs(fs: FileSystemHost, dir: Path): Iterable<Path> {
   for (const entry of fs.readDirSync(dir.toString())) {
+    const path = $.path(entry.name);
     if (entry.isFile) {
-      yield $.path(entry.name);
+      yield path;
     } else if (entry.isDirectory) {
       if (
-        entry.name !== ".git" && entry.name !== ".DS_STORE" &&
-        entry.name !== "dist" && entry.name !== "build" &&
-        entry.name !== "out" && entry.name !== "target"
+        !path.endsWith(".git") && !path.endsWith(".DS_STORE") &&
+        !path.endsWith("dist") && !path.endsWith("build") &&
+        !path.endsWith("out") && !path.endsWith("target")
       ) {
-        yield* walkFs(fs, dir.join(entry.name));
+        yield* walkFs(fs, path);
       }
     }
   }

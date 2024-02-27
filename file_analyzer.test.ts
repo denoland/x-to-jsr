@@ -39,6 +39,9 @@ import "./other.ts";
 global {
   interface GlobalTest {}
 }
+
+declare module "test" {
+}
 `,
   );
   const importMap = new ImportMapBuilder({});
@@ -53,6 +56,9 @@ import "./other.ts";
 global {
   interface GlobalTest {}
 }
+
+declare module "test" {
+}
 `,
   );
   assertEquals(importMap.build(), {
@@ -60,6 +66,11 @@ global {
     "@std/path": "jsr:@std/path@0.193",
   });
   assertEquals(steps, [
-    "Global type augmentation is not yet supported in JSR.\n    at ./file.ts:5:1",
+    "Global type augmentation is not yet supported in JSR.\n" +
+    "Ensure this file is not used via any export.\n" +
+    "    at ./file.ts:5:1\n",
+    "Global type augmentation is not yet supported in JSR.\n" +
+    "Ensure this file is not used via any export.\n" +
+    "    at ./file.ts:9:1\n",
   ]);
 });

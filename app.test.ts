@@ -132,13 +132,16 @@ Deno.test("runs the app when there's a mod.ts file", async () => {
 Deno.test("creates multiple exports when no mod.ts", async () => {
   const appOptions = build();
   const env = appOptions.environment;
+  env.fs.writeFileSync("/.git/asdf.ts", "export class Asdf {}");
   env.fs.writeFileSync("/asdf.ts", "export class Asdf {}");
   env.fs.writeFileSync("/other.ts", "export class Other {}");
+  env.fs.writeFileSync("/sub_dir/mod.ts", "export class SubDir {}");
   await runApp(appOptions);
   assertEquals(env.exitCode, undefined);
   assertEquals(env.logs, [
     "STEP: Analyzing /",
     "STEP: Building...",
+    "STEP: Analyzing /sub_dir/mod.ts",
     "STEP: Analyzing /asdf.ts",
     "STEP: Analyzing /other.ts",
     "STEP: Saving...",
@@ -155,6 +158,7 @@ Deno.test("creates multiple exports when no mod.ts", async () => {
   "name": "",
   "version": "",
   "exports": {
+    "./sub_dir/mod.ts": "./sub_dir/mod.ts",
     "./asdf.ts": "./asdf.ts",
     "./other.ts": "./other.ts"
   },

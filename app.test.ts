@@ -71,8 +71,8 @@ Deno.test("runs the app when there's nothing in the directory", async () => {
     "STEP: Done!",
     "",
     "Next steps:",
-    '  1. Fill in the "name" field in ./deno.jsonc',
-    '  2. Fill in the "version" field in ./deno.jsonc',
+    '  1. Fill in the "name" field in ./deno.json',
+    '  2. Fill in the "version" field in ./deno.json',
   ]);
 });
 
@@ -98,6 +98,70 @@ Deno.test("errors when has local git changes", async () => {
     "STEP: Analyzing /",
     "ERROR: Failed Git directory has pending changes. Please check in all changes before running this tool.",
   ]);
+});
+
+Deno.test("runs the app when there's a mod.ts file", async () => {
+  const appOptions = build();
+  const env = appOptions.environment;
+  env.fs.writeFileSync("/mod.ts", "export class Test {}");
+  await runApp(appOptions);
+  assertEquals(env.exitCode, undefined);
+  assertEquals(env.logs, [
+    "STEP: Analyzing /",
+    "STEP: Building...",
+    "STEP: Analyzing /mod.ts",
+    "STEP: Saving...",
+    "STEP: Done!",
+    "",
+    "Next steps:",
+    '  1. Fill in the "name" field in ./deno.json',
+    '  2. Fill in the "version" field in ./deno.json',
+  ]);
+  assertEquals(
+    env.fs.readFileSync("/deno.json"),
+    `{
+  "name": "",
+  "version": "",
+  "exports": "./mod.ts",
+  "imports": {}
+}
+`,
+  );
+});
+
+Deno.test("creates multiple exports when no mod.ts", async () => {
+  const appOptions = build();
+  const env = appOptions.environment;
+  env.fs.writeFileSync("/asdf.ts", "export class Asdf {}");
+  env.fs.writeFileSync("/other.ts", "export class Other {}");
+  await runApp(appOptions);
+  assertEquals(env.exitCode, undefined);
+  assertEquals(env.logs, [
+    "STEP: Analyzing /",
+    "STEP: Building...",
+    "STEP: Analyzing /asdf.ts",
+    "STEP: Analyzing /other.ts",
+    "STEP: Saving...",
+    "STEP: Done!",
+    "",
+    "Next steps:",
+    '  1. Fill in the "name" field in ./deno.json',
+    '  2. Fill in the "version" field in ./deno.json',
+    "  3. Make sure the exports in ./deno.json are how you want the exports.",
+  ]);
+  assertEquals(
+    env.fs.readFileSync("/deno.json"),
+    `{
+  "name": "",
+  "version": "",
+  "exports": {
+    "./asdf.ts": "./asdf.ts",
+    "./other.ts": "./other.ts"
+  },
+  "imports": {}
+}
+`,
+  );
 });
 
 function build() {

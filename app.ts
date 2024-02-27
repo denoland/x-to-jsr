@@ -1,6 +1,6 @@
 import { FileSystemHost } from "@ts-morph/common";
 import { Project } from "ts-morph";
-import { Path } from "dax";
+import $, { Path } from "dax";
 import { DenoJsonResolver } from "./deno_json.ts";
 import { ImportMapBuilder } from "./import_map.ts";
 import { FileAnalyzer } from "./file_analyzer.ts";
@@ -103,7 +103,7 @@ export async function runApp({
   }
   fs.writeFileSync(
     denoJson.path.toString(),
-    JSON.stringify(outputObj, undefined, 2),
+    JSON.stringify(outputObj, undefined, 2) + "\n",
   );
   logStep("Done!");
   outputSteps(denoJson.path);
@@ -134,6 +134,14 @@ export async function runApp({
     if (outputObj.version.length === 0) {
       steps.push(`Fill in the "version" field in ${relativeDenoJson}`);
     }
+    if (
+      typeof outputObj.exports === "object" &&
+      Object.entries(outputObj.exports).length > 1
+    ) {
+      steps.push(
+        `Make sure the exports in ${relativeDenoJson} are how you want the exports.`,
+      );
+    }
     for (const [key, value] of Object.entries(imports)) {
       if (value.startsWith("http:") || value.startsWith("https:")) {
         steps.push(
@@ -158,7 +166,7 @@ export async function runApp({
 function* walkFs(fs: FileSystemHost, dir: Path): Iterable<Path> {
   for (const entry of fs.readDirSync(dir.toString())) {
     if (entry.isFile) {
-      yield dir.join(entry.name);
+      yield $.path(entry.name);
     } else if (entry.isDirectory) {
       if (
         entry.name !== ".git" && entry.name !== ".DS_STORE" &&

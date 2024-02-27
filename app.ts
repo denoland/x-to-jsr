@@ -95,7 +95,7 @@ export async function runApp({
     } else {
       outputObj.exports = {
         ...[...scriptPaths, ...jsonPaths].map((p) => {
-          const path = "./" + cwd.relative(p);
+          const path = "./" + cwd.relative(p).replace(/\\/g, "/");
           return { [path.toString()]: path.toString() };
         }).reduce((a, b) => ({ ...a, ...b }), {}),
       };
@@ -173,7 +173,7 @@ function* walkFs(fs: FileSystemHost, dir: Path): Iterable<Path> {
         entry.name !== "dist" && entry.name !== "build" &&
         entry.name !== "out" && entry.name !== "target"
       ) {
-        yield* walkFs(fs, dir.join(entry.name));
+        yield* walkFs(fs, $.path(entry.name));
       }
     }
   }

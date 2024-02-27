@@ -10,9 +10,6 @@ import { ImportMapBuilder } from "./import_map.ts";
 import { Path } from "dax";
 import { StringLiteral } from "ts-morph";
 
-const globalTypeAugNotSupported = "";
-const ensureNotUsedByExport = "";
-
 export class FileAnalyzer {
   #mapper: SpecifierMapper;
   #cwd: Path;

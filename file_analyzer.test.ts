@@ -1,4 +1,4 @@
-import { SpecifierMapper } from "./specifiers/specifier_mapper.ts";
+import type { SpecifierMapper } from "./specifiers/specifier_mapper.ts";
 import { FileAnalyzer } from "./file_analyzer.ts";
 import { assertEquals } from "@std/assert";
 import { InMemoryFileSystemHost, Project } from "ts-morph";

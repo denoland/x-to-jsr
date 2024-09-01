@@ -1,9 +1,9 @@
 import { InMemoryFileSystemHost } from "ts-morph";
-import { Environment, runApp } from "./app.ts";
+import { type Environment, runApp } from "./app.ts";
 import { FileAnalyzer } from "./file_analyzer.ts";
 import $ from "dax";
-import { JsrApi } from "./apis/JsrApi.ts";
-import { ApiLandApi } from "./apis/ApiLand.ts";
+import type { JsrApi } from "./apis/JsrApi.ts";
+import type { ApiLandApi } from "./apis/ApiLand.ts";
 import { RealSpecifierMapper } from "./specifiers/specifier_mapper.ts";
 import { RealSlashXToJsrPkgMapper } from "./specifiers/slash_x_to_jsr_mapper.ts";
 import { DenoJsonResolver } from "./deno_json.ts";

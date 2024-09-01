@@ -1,4 +1,4 @@
-import { SlashXToJsrPkgMapper } from "./slash_x_to_jsr_mapper.ts";
+import type { SlashXToJsrPkgMapper } from "./slash_x_to_jsr_mapper.ts";
 
 export interface MappedSpecifier {
   base: string;

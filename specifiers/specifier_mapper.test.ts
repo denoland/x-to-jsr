@@ -1,6 +1,6 @@
 import { RealSpecifierMapper } from "./specifier_mapper.ts";
 import { assertEquals } from "@std/assert";
-import { SlashXToJsrPkgMapper } from "./slash_x_to_jsr_mapper.ts";
+import type { SlashXToJsrPkgMapper } from "./slash_x_to_jsr_mapper.ts";
 import type { JsrPackage } from "../apis/JsrApi.ts";
 
 Deno.test("maps specifiers", async () => {

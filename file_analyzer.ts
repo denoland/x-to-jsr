@@ -1,13 +1,13 @@
 import {
-  ExportDeclaration,
-  ImportDeclaration,
+  type ExportDeclaration,
+  type ImportDeclaration,
   ModuleDeclarationKind,
   Node,
-  SourceFile,
+  type SourceFile,
 } from "ts-morph";
-import { SpecifierMapper } from "./specifiers/specifier_mapper.ts";
-import { ImportMapBuilder } from "./import_map.ts";
-import { Path } from "dax";
+import type { SpecifierMapper } from "./specifiers/specifier_mapper.ts";
+import type { ImportMapBuilder } from "./import_map.ts";
+import type { Path } from "dax";
 import { StringLiteral } from "ts-morph";
 
 export class FileAnalyzer {

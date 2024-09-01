@@ -1,5 +1,5 @@
-import $, { Path } from "dax";
-import { errors, FileSystemHost } from "@ts-morph/common";
+import $, { type Path } from "dax";
+import { errors, type FileSystemHost } from "@ts-morph/common";
 
 export interface DenoJson {
   path: Path;

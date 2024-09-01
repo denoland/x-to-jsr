@@ -1,9 +1,9 @@
-import { FileSystemHost } from "@ts-morph/common";
+import type { FileSystemHost } from "@ts-morph/common";
 import { Project } from "ts-morph";
-import $, { Path } from "dax";
-import { DenoJsonResolver } from "./deno_json.ts";
+import $, { type Path } from "dax";
+import type { DenoJsonResolver } from "./deno_json.ts";
 import { ImportMapBuilder } from "./import_map.ts";
-import { FileAnalyzer } from "./file_analyzer.ts";
+import type { FileAnalyzer } from "./file_analyzer.ts";
 
 export interface Environment {
   fs: FileSystemHost;

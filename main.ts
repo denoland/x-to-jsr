@@ -1,6 +1,6 @@
 import $, { CommandBuilder } from "dax";
 import { RealFileSystemHost } from "@ts-morph/common";
-import { Environment, runApp } from "./app.ts";
+import { type Environment, runApp } from "./app.ts";
 import { DenoJsonResolver } from "./deno_json.ts";
 import { RealSpecifierMapper } from "./specifiers/specifier_mapper.ts";
 import { RealApiLandApi } from "./apis/ApiLand.ts";

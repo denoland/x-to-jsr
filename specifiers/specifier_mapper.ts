@@ -88,7 +88,7 @@ class DenoStdMapper {
   }
 }
 
-const denoLandRe = /^https:\/\/deno\.land\/x\/([^@]+)@([^/]+)\/(.+)$/;
+const denoLandRe = /^https:\/\/deno\.land\/x\/([^@]+)@v?([^/]+)\/(.+)$/;
 
 class DenoLandMapper {
   #slashXToJsrPkgMapper: SlashXToJsrPkgMapper;

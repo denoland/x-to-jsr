@@ -34,4 +34,13 @@ Deno.test("maps specifiers", async () => {
       subpath: "",
     },
   );
+
+  assertEquals(
+    await mapper.map("https://deno.land/x/ts_morph@v21.0.0/mod.ts"),
+    {
+      bareSpecifier: `@david/ts-morph`,
+      base: `jsr:@david/ts-morph@21.0.0`,
+      subpath: "",
+    },
+  );
 });
